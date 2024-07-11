@@ -1,0 +1,162 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0",
+      "title": "Firebase Realtime Database API",
+      "description": "API to interact with Firebase Realtime Database"
+    },
+    "basePath": "/",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/addUser": {
+        "post": {
+          "summary": "Insert a user into Firebase Realtime Database",
+          "description": "Insert a user into Firebase Realtime Database with default image",
+          "consumes": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "user",
+              "description": "The user to create",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id_user",
+                  "active_status"
+                ],
+                "properties": {
+                  "id_user": {
+                    "type": "integer"
+                  },
+                  "active_status": {
+                    "type": "boolean"
+                  },
+                  "avatar": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User created successfully"
+            },
+            "400": {
+              "description": "Bad request"
+            }
+          }
+        }
+      },
+      "/getUserConfig/{id_user}": {
+        "get": {
+          "summary": "Retrieve user configuration from Firebase Realtime Database",
+          "description": "Retrieve user configuration for a given user ID from Firebase Realtime Database",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id_user",
+              "required": true,
+              "description": "ID of the user",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User configuration retrieved successfully"
+            },
+            "404": {
+              "description": "User not found"
+            },
+            "500": {
+              "description": "Internal server error"
+            }
+          }
+        }
+      },
+      "/updateActiveStatus/{id_user}/{active_status}": {
+        "put": {
+          "summary": "Update active status of a user in Firebase Realtime Database",
+          "description": "Update the active status of a user (true/false) in Firebase Realtime Database",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id_user",
+              "required": true,
+              "description": "ID of the user",
+              "type": "string"
+            },
+            {
+              "in": "path",
+              "name": "active_status",
+              "required": true,
+              "description": "New active status of the user (1 for true, 0 for false)",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User active status updated successfully"
+            },
+            "404": {
+              "description": "User not found"
+            },
+            "500": {
+              "description": "Internal server error"
+            }
+          }
+        }
+      },
+      "/updateAvatar/{id_user}": {
+        "put": {
+          "summary": "Update avatar URL of a user in Firebase Realtime Database",
+          "description": "Update the avatar URL of a user in Firebase Realtime Database",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id_user",
+              "required": true,
+              "description": "ID of the user",
+              "type": "string"
+            },
+            {
+              "in": "body",
+              "name": "avatar",
+              "required": true,
+              "description": "New avatar URL",
+              "schema": {
+                "type": "object",
+                "required": [
+                  "avatar"
+                ],
+                "properties": {
+                  "avatar": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User avatar URL updated successfully"
+            },
+            "404": {
+              "description": "User not found"
+            },
+            "500": {
+              "description": "Internal server error"
+            }
+          }
+        }
+      }
+    }
+  }
+  
