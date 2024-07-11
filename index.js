@@ -1,4 +1,3 @@
-// index.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const { ref, set, get, update } = require('firebase/database');
@@ -6,10 +5,14 @@ const db = require('./firebaseConfig');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const { expressjwt } = require('express-jwt'); // Ajuste aquí
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+const SECRET_KEY = 'LOSCASAALEX123'; // Cambia esta clave por una más segura
 
 const swaggerOptions = {
   swaggerDefinition: {
@@ -24,6 +27,56 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+// Middleware para proteger rutas con JWT
+app.use(expressjwt({ secret: SECRET_KEY, algorithms: ['HS256'] }).unless({ path: ['/login', '/api-docs'] }));
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Generate a JWT token
+ *     description: Generate a JWT token for a user
+ *     parameters:
+ *       - in: body
+ *         name: user
+ *         description: The user credentials
+ *         schema:
+ *           type: object
+ *           required:
+ *             - username
+ *             - password
+ *           properties:
+ *             username:
+ *               type: string
+ *             password:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: Token generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Internal server error
+ */
+// Ruta para generar token
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  
+  // Aquí debes agregar la lógica para verificar las credenciales
+  // Supongamos que las credenciales son válidas
+  const user = { id: 1, username: 'testUser' }; // Esto debería venir de tu base de datos
+  
+  const token = jwt.sign({ user }, SECRET_KEY, { expiresIn: '1h' });
+  res.json({ token });
+});
 
 /**
  * @swagger
@@ -57,7 +110,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.post('/addUser', (req, res) => {
   const { id_user, active_status, avatar = 'https://firebasestorage.googleapis.com/v0/b/brilliant-era-407902.appspot.com/o/avatars%2F00a8d634116e1179823d8465b168a2c6.jpg?alt=media&token=ae11ef4f-acc2-4551-b6aa-15882de721fc' } = req.body;
 
-
   const userRef = ref(db, 'userconfig/' + id_user);
   set(userRef, {
     id_user,
@@ -67,7 +119,6 @@ app.post('/addUser', (req, res) => {
   .then(() => res.status(200).send('User created successfully'))
   .catch((error) => res.status(500).send(error.message));
 });
-
 
 /**
  * @swagger
@@ -204,7 +255,7 @@ app.put('/updateAvatar/:id_user', (req, res) => {
     .catch((error) => res.status(500).send(error.message));
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
